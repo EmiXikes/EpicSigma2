@@ -59,7 +59,9 @@ Public Class Defs
         End Function
 
 
-        Private Function TestablePropertyValue(ByVal dxTestableItem As Object, ByVal CondTestableValDescriptor As TestablePropertyDescriptor) As String
+        Private Function TestablePropertyValue(ByVal dxTestableItem As Object, ByVal TestableProperty As TestablePropertyDescriptor) As String
+
+            ''TODO maybe encapsulate the input object dxTestableItem in a custom class together with actual/exact dxObj type descriptor EnumObjectType
 
         End Function
 
