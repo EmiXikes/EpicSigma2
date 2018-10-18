@@ -13,53 +13,63 @@ Public Class Defs
             Return 0
         End Function
 
-        Public Function MatchingElements(ByVal dxDoc As DxfDocument) As List(Of Object)
+        Public Function MatchingElements(ByVal dxDoc As DxfDocument) As dxfItemSet
 
             Dim doesItemMatchConditions As Boolean
             Dim Result As New List(Of Object)
+            Dim ReturnSet As New dxfItemSet
 
             Select Case ObjectType
                 Case EnumObjectType.Block
+                    ReturnSet.itemType = GetType(netDxf.Entities.Insert)
                     For Each T In dxDoc.Inserts
                         doesItemMatchConditions = False
 
                         ''TODO additional checks, if this is actually an OK block (excluding xrefs, images, ect)
                         For Each C In Conditions
-                            doesItemMatchConditions = doConditionsMatch(TestablePropertyValue(T, C.TestableProperty), C.MatchValue, C.CompareType)
+                            doesItemMatchConditions = doConditionsMatch(
+                                TestablePropertyValue(New dxfItem With {.itemType = T.GetType, .item = T}, C.TestableProperty),
+                                C.MatchValue,
+                                C.CompareType)
                         Next
                         If doesItemMatchConditions = True Then
-                            Result.Add(T)
+                            ReturnSet.items.Add(T)
                         End If
                     Next
 
                 Case EnumObjectType.Line
+                    ReturnSet.itemType = GetType(netDxf.Entities.Line)
                     For Each T In dxDoc.Lines
 
                     Next
                 Case EnumObjectType.PLine
+                    ReturnSet.itemType = GetType(netDxf.Entities.LwPolyline)
                     For Each T In dxDoc.LwPolylines
 
                     Next
                 Case EnumObjectType.Text
+                    ReturnSet.itemType = GetType(netDxf.Entities.Text)
                     For Each T In dxDoc.Texts
 
                     Next
                 Case EnumObjectType.MText
+                    ReturnSet.itemType = GetType(netDxf.Entities.MText)
                     For Each T In dxDoc.MTexts
 
                     Next
                 Case EnumObjectType.Hatch
+                    ReturnSet.itemType = GetType(netDxf.Entities.Hatch)
                     For Each T In dxDoc.Hatches
 
                     Next
             End Select
 
-
+            Return ReturnSet
 
         End Function
 
 
-        Private Function TestablePropertyValue(ByVal dxTestableItem As Object, ByVal TestableProperty As TestablePropertyDescriptor) As String
+        Private Function TestablePropertyValue(ByVal dxTestableItem As dxfItem, ByVal TestableProperty As TestablePropertyDescriptor) As String
 
             ''TODO maybe encapsulate the input object dxTestableItem in a custom class together with actual/exact dxObj type descriptor EnumObjectType
 
@@ -75,6 +85,16 @@ Public Class Defs
             Return False
         End Function
 
+    End Class
+
+    Public Class dxfItemSet
+        Public itemType As Type
+        Public items As New List(Of Object)
+    End Class
+
+    Public Class dxfItem
+        Public itemType As Type
+        Public item As Object
     End Class
 
     Public Class TCondition
