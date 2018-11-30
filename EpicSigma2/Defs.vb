@@ -1,11 +1,19 @@
 ﻿Imports netDxf
 Imports netDxf.Entities
+Imports EpicSigma2.CadEnities
+
+Public Class HelperFunctions
+    Public Shared Function ExtractDxfItems(ByVal DxDocs As List(Of DxfDocument)) As List(Of Defs.dxfItem)
+        'TODO write a merging function, that aggragates all the dxfitems from the given dxfDocuments
+    End Function
+End Class
 
 Public Class Defs
+
     Public Class TEntry
         Public OutFields As Object
 
-        Public ObjectType As EnumObjectType
+        ''Public ObjectType As EnumObjectType
         Public Conditions As New List(Of TCondition)
 
         Public Function AddCondition(ByVal NewCondition As TCondition)
@@ -13,66 +21,60 @@ Public Class Defs
             Return 0
         End Function
 
-        Public Function MatchingElements(ByVal dxDoc As DxfDocument) As dxfItemSet
+        Public Function MatchingElements(ByVal DxDocs As List(Of DxfDocument)) As List(Of dxfItem)
 
             Dim doesItemMatchConditions As Boolean
             Dim Result As New List(Of Object)
-            Dim ReturnSet As New dxfItemSet
+            Dim ReturnSet As New List(Of dxfItem)
 
-            Select Case ObjectType
-                Case EnumObjectType.Block
-                    ReturnSet.itemType = GetType(netDxf.Entities.Insert)
-                    For Each T In dxDoc.Inserts
-                        doesItemMatchConditions = False
+            Dim InputDxfItems As List(Of dxfItem) = HelperFunctions.ExtractDxfItems(DxDocs)
 
-                        ''TODO additional checks, if this is actually an OK block (excluding xrefs, images, ect)
-                        For Each C In Conditions
-                            doesItemMatchConditions = doConditionsMatch(
-                                TestablePropertyValue(New dxfItem With {.itemType = T.GetType, .item = T}, C.TestableProperty),
-                                C.MatchValue,
-                                C.CompareType)
-                        Next
-                        If doesItemMatchConditions = True Then
-                            ReturnSet.items.Add(T)
-                        End If
-                    Next
-
-                Case EnumObjectType.Line
-                    ReturnSet.itemType = GetType(netDxf.Entities.Line)
-                    For Each T In dxDoc.Lines
-
-                    Next
-                Case EnumObjectType.PLine
-                    ReturnSet.itemType = GetType(netDxf.Entities.LwPolyline)
-                    For Each T In dxDoc.LwPolylines
-
-                    Next
-                Case EnumObjectType.Text
-                    ReturnSet.itemType = GetType(netDxf.Entities.Text)
-                    For Each T In dxDoc.Texts
-
-                    Next
-                Case EnumObjectType.MText
-                    ReturnSet.itemType = GetType(netDxf.Entities.MText)
-                    For Each T In dxDoc.MTexts
-
-                    Next
-                Case EnumObjectType.Hatch
-                    ReturnSet.itemType = GetType(netDxf.Entities.Hatch)
-                    For Each T In dxDoc.Hatches
-
-                    Next
-            End Select
+            For Each D In InputDxfItems
+                doesItemMatchConditions = False
+                For Each C In Conditions
+                    doesItemMatchConditions = doConditionsMatch(TestablePropertyValue(D, C.TestableProperty), C.MatchValue, C.CompareType)
+                Next
+                If doesItemMatchConditions = True Then
+                    ReturnSet.Add(D)
+                End If
+            Next
 
             Return ReturnSet
 
-        End Function
+            'Select Case ObjectType
+            '    Case EnumObjectType.Block
+            '        ReturnSet.itemType = GetType(netDxf.Entities.Insert)
+            '        For Each T In dxDoc.Inserts
+            '            doesItemMatchConditions = False
 
+            '            ''TODO additional checks, if this is actually an OK block (excluding xrefs, images, ect)
+            '            For Each C In Conditions
+            '                doesItemMatchConditions = doConditionsMatch(
+            '                    TestablePropertyValue(New dxfItem With {.itemType = T.GetType, .item = T}, C.TestableProperty),
+            '                    C.MatchValue,
+            '                    C.CompareType)
+            '            Next
+            '            If doesItemMatchConditions = True Then
+            '                ReturnSet.items.Add(T)
+            '            End If
+            '        Next
+
+            'End Select
+
+            'Return ReturnSet
+
+        End Function
 
         Private Function TestablePropertyValue(ByVal dxTestableItem As dxfItem, ByVal TestableProperty As TestablePropertyDescriptor) As String
 
             ''TODO maybe encapsulate the input object dxTestableItem in a custom class together with actual/exact dxObj type descriptor EnumObjectType
+            Select Case TestableProperty.TestableProp
+                Case EnumTestableProp.Layer
 
+                Case EnumTestableProp.Color
+
+
+            End Select
         End Function
 
         Private Function doConditionsMatch(ByVal TestValue As String, ByVal MatchValue As String, CompareType As EnumCompareType) As Boolean
@@ -93,7 +95,7 @@ Public Class Defs
     End Class
 
     Public Class dxfItem
-        Public itemType As Type
+        Public itemType As EnumObjectType
         Public item As Object
     End Class
 
