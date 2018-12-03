@@ -71,7 +71,7 @@ Public Class Defs
 
         Private Function TestablePropertyValue(ByVal dxTestableItem As dxfItem, ByVal TestableProperty As TestablePropertyDescriptor) As String
 
-            ''TODO maybe encapsulate the input object dxTestableItem in a custom class together with actual/exact dxObj type descriptor EnumObjectType
+            ''TODO write this
 
         End Function
 
@@ -108,8 +108,6 @@ Public Class Defs
 
     End Class
 
-
-
     Public Class TestablePropertyDescriptor
 
         Public TestableProp As EnumTestableProp
@@ -127,8 +125,6 @@ Public Class Defs
         Attribute
     End Enum
 
-
-
     Enum EnumObjectType
         Block
         Line
@@ -137,7 +133,6 @@ Public Class Defs
         MText
         Hatch
     End Enum
-
 
     Enum EnumCompareType
         Equals
