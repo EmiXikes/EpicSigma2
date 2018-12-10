@@ -12,6 +12,11 @@ Public Class HelperFunctions
             For Each I In DxDoc.Inserts
                 ResultList.Add(New Defs.dxfItem With {.item = I, .itemType = Defs.EnumObjectType.Block})
             Next
+            For Each I In DxDoc.Hatches
+                ResultList.Add(New Defs.dxfItem With {.item = I, .itemType = Defs.EnumObjectType.Hatch})
+            Next
+
+            'TODO Complete the list
         Next
 
         Return ResultList
@@ -77,7 +82,6 @@ Public Class Defs
         End Function
 
         Private Function TestablePropertyValue(ByVal dxTestableItem As dxfItem, ByVal TestableProperty As TestablePropertyDescriptor) As String
-
 
             ''TODO maybe encapsulate the input object dxTestableItem in a custom class together with actual/exact dxObj type descriptor EnumObjectType
             Select Case TestableProperty.TestableProp
