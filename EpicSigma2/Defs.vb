@@ -5,6 +5,17 @@ Imports EpicSigma2.CadEnities
 Public Class HelperFunctions
     Public Shared Function ExtractDxfItems(ByVal DxDocs As List(Of DxfDocument)) As List(Of Defs.dxfItem)
         'TODO write a merging function, that aggragates all the dxfitems from the given dxfDocuments
+
+        Dim ResultList As New List(Of Defs.dxfItem)
+
+        For Each DxDoc In DxDocs
+            For Each I In DxDoc.Inserts
+                ResultList.Add(New Defs.dxfItem With {.item = I, .itemType = Defs.EnumObjectType.Block})
+            Next
+        Next
+
+        Return ResultList
+
     End Function
 End Class
 
@@ -67,12 +78,17 @@ Public Class Defs
 
         Private Function TestablePropertyValue(ByVal dxTestableItem As dxfItem, ByVal TestableProperty As TestablePropertyDescriptor) As String
 
+
             ''TODO maybe encapsulate the input object dxTestableItem in a custom class together with actual/exact dxObj type descriptor EnumObjectType
             Select Case TestableProperty.TestableProp
                 Case EnumTestableProp.Layer
-
+                    Return dxTestableItem.item.Layer.Name
                 Case EnumTestableProp.Color
+                    Return dxTestableItem.item.Color.ToString()
 
+                    'If dxTestableItem.itemType = EnumObjectType.Block Then Return dxTestableItem.item.Layer.Name
+                    ''Dim dxObj As netDxf.Entities.Insert = dxTestableItem.item
+                    ''dxObj.Color.ToString()
 
             End Select
         End Function
